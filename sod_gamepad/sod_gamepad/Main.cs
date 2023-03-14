@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,8 +15,8 @@ namespace sod_gamepad
     public partial class Main : Form
     {
         string selectedPath = "";
-        string original_md5 = "6e789355853093cacee88b87f7726751";
-        string expected_md5 = "4e030c0e6f9ea800753c4c4e69229111";
+        string original_md5 = "fc2ac8fdbf92d01396f3daddcf2e9bed";
+        string expected_md5 = "14ff23b7db580986274ac5da8c816f16";
         public Main()
         {
             InitializeComponent();
@@ -83,25 +83,27 @@ namespace sod_gamepad
                 //patching UnityPlayer.dll
                 BinaryWriter data = new BinaryWriter(File.OpenWrite(path));
 
+                //InputManager::ProcessInput
                 //workaround axis conflict
-                //103946c2: f3 0f 10 50 04          MOVSS XMM2, dword ptr [EAX+4]
-                data.BaseStream.Position = 0x393ac3;
+                //1039c102: f3 0f 10 50 04          MOVSS XMM2, dword ptr [EAX+4]
+                data.BaseStream.Position = 0x39b503;
                 uint axis_1 = 0x0450100f;
                 data.Write(axis_1);
 
-                //103946cf: f3 0f 10 00 90          MOVSS XMM0, dword ptr [EAX]
-                data.BaseStream.Position = 0x393ad0;
+                //1039c10f: f3 0f 10 00 90          MOVSS XMM0, dword ptr [EAX]
+                data.BaseStream.Position = 0x39b510;
                 uint axis_2 = 0x9000100f;
                 data.Write(axis_2);
 
+                //win::RawInput::HidDevice::UpdateStateFromXInput
                 //fixing swapped axis
-                //1068187a: f3 0f 11 40 74          MOVSS dword ptr [EAX+0x74], XMM0
-                data.BaseStream.Position = 0x680c7b;
+                //1068de8a: f3 0f 11 40 74          MOVSS dword ptr [EAX+0x74], XMM0
+                data.BaseStream.Position = 0x68d28b;
                 uint swap_1 = 0x7440110f;
                 data.Write(swap_1);
 
-                //106818a3: f3 0f 11 40 70          MOVSS dword ptr [EAX+0x70], XMM0
-                data.BaseStream.Position = 0x680ca4;
+                //1068deb3: f3 0f 11 40 70          MOVSS dword ptr [EAX+0x70], XMM0
+                data.BaseStream.Position = 0x68d2b4;
                 uint swap_2 = 0x7040110f;
                 data.Write(swap_2);
 
@@ -130,23 +132,23 @@ namespace sod_gamepad
                 //reverting UnityPlayer.dll to original code
                 BinaryWriter data = new BinaryWriter(File.OpenWrite(path));
 
-                //103946c2: f3 0f 10 14 88          MOVSS XMM2, dword ptr [EAX + this*0x4]
-                data.BaseStream.Position = 0x393ac3;
+                //1039c102: f3 0f 10 14 88          MOVSS XMM2, dword ptr [EAX + this*0x4]
+                data.BaseStream.Position = 0x39b503;
                 uint axis_1 = 0x8814100f;
                 data.Write(axis_1);
 
-                //103946cf: f3 0f 10 04 88          MOVSS XMM0, dword ptr [EAX + this*0x4]
-                data.BaseStream.Position = 0x393ad0;
+                //1039c10f: f3 0f 10 04 88          MOVSS XMM0, dword ptr [EAX + this*0x4]
+                data.BaseStream.Position = 0x39b510;
                 uint axis_2 = 0x8804100f;
                 data.Write(axis_2);
 
-                //1068187a: f3 0f 11 40 70          MOVSS dword ptr [EAX+0x70], XMM0
-                data.BaseStream.Position = 0x680c7b;
+                //1068de8a: f3 0f 11 40 70          MOVSS dword ptr [EAX+0x70], XMM0
+                data.BaseStream.Position = 0x68d28b;
                 uint swap_1 = 0x7040110f;
                 data.Write(swap_1);
 
-                //106818a3: f3 0f 11 40 74          MOVSS dword ptr [EAX+0x74], XMM0
-                data.BaseStream.Position = 0x680ca4;
+                //1068deb3: f3 0f 11 40 74          MOVSS dword ptr [EAX+0x74], XMM0
+                data.BaseStream.Position = 0x68d2b4;
                 uint swap_2 = 0x7440110f;
                 data.Write(swap_2);
 
